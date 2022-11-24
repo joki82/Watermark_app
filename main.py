@@ -4,6 +4,8 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont, ImageGrab
 
 
 class ImageWaterMark(Tk):
+    """Creating main window, creating two frames - photo and buttons. Placing canvas over photo frame,
+    call widgets method to create and place buttons in buttons frame"""
     def __init__(self):
         super().__init__()
         self.title("test canvas")
@@ -13,7 +15,7 @@ class ImageWaterMark(Tk):
         self.photo_frame = Frame(width=550, height=500, bg="lightgray")
         self.photo_frame.grid(row=0, column=0)
         self.canvas = Canvas(width=500, height=400, bg="white")
-        self.canvas.grid(row=0, column=0, sticky="e")
+        self.canvas.grid(row=0, column=0)
 
         self.widgets_frame = Frame(width=150, height=500, bg="green")
         self.widgets_frame.grid(row=0, column=1, padx=20)
@@ -27,6 +29,7 @@ class ImageWaterMark(Tk):
         self.mainloop()
 
     def widgets(self):
+        """Creating buttons and text entry"""
         self.browse_button = Button(self.widgets_frame, text="Browse", command=self.display_image,
                                     highlightbackground="lightgray")
         self.browse_button.grid(row=0, column=0, sticky="wens")
@@ -39,11 +42,14 @@ class ImageWaterMark(Tk):
         self.add_watermark_button = Button(self.widgets_frame, command=self.add_watermark, text="Add Watermark",
                                            highlightbackground="lightgray")
         self.add_watermark_button.grid(row=2, column=0, sticky="wens")
-        self.save_button = Button(self.widgets_frame, text="Save", highlightbackground="lightgray")
+        self.save_button = Button(self.widgets_frame, text="Save", command=self.save_image,
+                                  highlightbackground="lightgray")
         self.save_button.grid(row=3, column=0, sticky="wens")
 
 
     def browse(self):
+        """Browse button _ opens file dialog to select image. Method called from display_image and returning
+        selected file to display image"""
         file = filedialog.askopenfilename()
         print(type(file))
         print(file)
@@ -51,6 +57,7 @@ class ImageWaterMark(Tk):
         # self.display_image(file)
 
     def display_image(self):
+        """Open object received from browse method and place it on canvas"""
         file = self.browse()
         print(file)
         image = Image.open(file)
@@ -58,66 +65,38 @@ class ImageWaterMark(Tk):
         photo = ImageTk.PhotoImage(resize_img)
         print(f"photo: {type(photo)}")
         self.canvas.grid_forget()
+        # TODO write code to get imported image width&height and determine resize ratio to make canvas same size,
+        #  that image fills canvas. Important for image crop to not have part of background crop
         self.canvas = Canvas(width=500, height=400, bg="white")
         self.canvas.grid(row=0, column=0)
         self.canvas.create_image(250, 200, image=photo)
         self.mainloop()
 
     def add_watermark(self):
+        # TODO create text coordinates entry and proceed to create_text(x,y)
+        # TODO
+        # TODO change font or make selection of few
         wm_text = self.text_entry.get()
         print(wm_text)
         self.canvas.create_text(100, 100, text=wm_text, fill="black")
         self.mainloop()
 
+    def save_image(self):
+        # get main window x/y coordinates + canvas x/y
+        canvas_x = self.winfo_rootx() + self.canvas.winfo_x()
+        canvas_y = self.winfo_rooty() + self.canvas.winfo_y()
+        print(canvas_x, canvas_y)
+        # get canvas width & height to determine end x/y cor for crop
+        canvas_width = canvas_x + self.canvas.winfo_width()
+        canvas_height = canvas_y + self.canvas.winfo_height()
+        print(canvas_width, canvas_height)
+        #  crop canvas with displayed image and save. File path + name of file with extension.
+        # TODO implement asksavefile instead manually set file path
+        ImageGrab.grab().crop((canvas_x, canvas_y, canvas_width, canvas_height)).save("/Users/Josip/Desktop/canvas.png")
 
 
 ImageWaterMark()
 
 
-# window = Tk()
-# window.title("test canvas")
-# window.minsize(500, 500)
-#
-# path = ""
-#
-#
-# def browse():
-#     global path
-#     path = filedialog.askopenfilename()
-#     get_path()
-#
-#
-# def get_path():
-#     print(type(path))
-#
-#
-# browse_button = Button(text="Browse", command=browse)
-# browse_button.pack()
-#
-# print(path)
-#
-# canvas = Canvas(width=400, height=400, bg="white")
-# canvas.pack()
-#
-# image = Image.open()
-# photo = ImageTk.PhotoImage(image)
-# canvas.create_image(200, 200, image=photo)
-#
-# window.mainloop()
 
-# photo = Image.open("/Users/Josip/Desktop/Programiranje/Python/Project/56. Personal web page/static/PNGPIX_Tool.png")
-# print(photo.format, photo.size, photo.mode)
-#
-#
-#
-#
-#
-# for infile in sys.argv[1:]:
-#     f, e = os.path.splitext(infile)
-#     outfile = f + ".jpg"
-#     if infile != outfile:
-#         try:
-#             with Image.open(infile) as im:
-#                 im.save(outfile)
-#         except OSError:
-#             print("cannot convert", infile)
+
