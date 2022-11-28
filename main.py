@@ -68,19 +68,10 @@ class ImageWaterMark(Tk):
                                   fg="black", justify=CENTER)
         self.size_entry.grid(row=4, column=1, sticky="wens")
 
-        # Function to change background and font color of color spinbox
-        def change_color():
-            color = self.color_entry.get()
-            if color != "White":
-                self.color_entry.config(fg="white")
-            else:
-                self.color_entry.config(fg="black")
-            self.color_entry.config(bg=f"{color}")
-
         color_label = Label(labels_frame, text="Color:", bg="lightgray", fg="black")
         color_label.grid(row=5, column=0, sticky="wens")
         self.color_entry = Spinbox(labels_frame, bg="white", highlightbackground="lightgray", justify=CENTER,
-                                   fg="black", values=COLORS, command=change_color)
+                                   fg="black", values=COLORS, command=self.change_color)
         self.color_entry.grid(row=5, column=1, sticky="wens")
 
         # Widget frame, add_watermark and save buttons
@@ -90,6 +81,15 @@ class ImageWaterMark(Tk):
         save_button = Button(self.widgets_frame, text="Save", command=self.save_image,
                              highlightbackground="lightgray")
         save_button.grid(row=3, column=0, sticky="wens")
+
+    def change_color(self):
+        """Change background and font color of spinbox"""
+        color = self.color_entry.get()
+        if color == "Black":
+            self.color_entry.config(fg="white")
+        else:
+            self.color_entry.config(fg="black")
+        self.color_entry.config(bg=f"{color}")
 
     def browse(self):
         """Browse button opens file dialog to select an image and returns"""
